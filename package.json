@@ -28,6 +28,7 @@
   },
   "homepage": "https://github.com/MRegirouard/Snowtifier#readme",
   "dependencies": {
+    "@eta357/config-reader": "^2.1.1",
     "twitter": "^1.7.1"
   }
 }
