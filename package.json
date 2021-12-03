@@ -26,5 +26,8 @@
   "bugs": {
     "url": "https://github.com/MRegirouard/Snowtifier/issues"
   },
-  "homepage": "https://github.com/MRegirouard/Snowtifier#readme"
+  "homepage": "https://github.com/MRegirouard/Snowtifier#readme",
+  "dependencies": {
+    "twitter": "^1.7.1"
+  }
 }
