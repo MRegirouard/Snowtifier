@@ -7,7 +7,10 @@ const configOptions =
 {
 	'API Key': '',
 	'API Key Secret': '',
-	'Bearer Token': ''
+	'Bearer Token': '',
+	'Zip Code': '',
+	'Snow Day Count':'',
+	'School Type':''
 }
 var config
 
