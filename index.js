@@ -1,6 +1,7 @@
 const confReader = require('@eta357/config-reader')
 const twitter = require('twitter')
 const fetch = require('node-fetch')
+const sqlite3 = require('sqlite3').verbose()
 
 const configFile = './Options.json'
 const configOptions =
