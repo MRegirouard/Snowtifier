@@ -1,5 +1,5 @@
 const confReader = require('@eta357/config-reader')
-const twitter = require('twitter')
+const twitter = require('twitter-api-v2')
 const fetch = require('node-fetch')
 const sqlite3 = require('sqlite3').verbose()
 

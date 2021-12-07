@@ -31,6 +31,6 @@
     "@eta357/config-reader": "^2.1.1",
     "node-fetch": "^2.6.6",
     "sqlite3": "^5.0.2",
-    "twitter": "^1.7.1"
+    "twitter-api-v2": "^1.7.1"
   }
 }
