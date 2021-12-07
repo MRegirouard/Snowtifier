@@ -16,6 +16,36 @@ const configOptions =
 }
 var config
 
+var tweetInsert
+
+const db = new sqlite3.Database('Tweets.db', (error) =>
+{
+	if (error)
+	{
+		console.error('[ FAIL ] Error opening database:', error)
+		process.exit(1)
+	}
+
+
+	db.run('CREATE TABLE IF NOT EXISTS tweets (time DATETIME PRIMARY_KEY DEFAULT CURRENT_TIMESTAMP, prediction INTEGER, content TEXT, tweetID TEXT);', (error) =>
+	{
+		if (error)
+		{
+			console.error('[ FAIL ] Error creating tweets SQL table:', error)
+			process.exit(1)
+		}
+
+		tweetInsert = db.prepare('INSERT INTO tweets (prediction, content, tweetID) VALUES (?, ?, ?);', (error) =>
+		{
+			if (error)
+			{
+				console.error('[ FAIL ] Error preparing tweets SQL insert:', error)
+				process.exit(1)
+			}
+		})
+	})
+})
+
 var client
 
 /**
