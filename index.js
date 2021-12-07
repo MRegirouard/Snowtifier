@@ -85,6 +85,29 @@ function getPrediction(date, zipCode, snowDayCount, schoolType)
 			.catch((error) => reject(error))
 	})
 }
+
+/**
+ * Get the week day name from a Date object.
+ * @param {Date} date The Date object to get the weekday name from.
+ * @returns The name of the week day.
+ */
+function getWeekday(date)
+{
+	const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+	return days[date.getDay()]
+}
+
+/**
+ * Get the month name from a Date object.
+ * @param {Date} date The Date object to get the month name from.
+ * @returns The name of the month.
+ */
+function getMonth(date)
+{
+	const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+	return months[date.getMonth()]
+}
+
 confReader.readOptions(configFile, configOptions).then((options) =>
 {
 	console.info('[  OK  ] Successfully read config information.')
