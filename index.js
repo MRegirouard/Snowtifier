@@ -194,6 +194,26 @@ function sendTweet(pastPrediction, currentPrediction, predictionDate)
 	})
 }
 
+/**
+ * Gets rows with a time value that is greater than the current time minus hourCount hours.
+ * Sorts rows descending, so the most recent row is first.
+ * @param {Number} hourCount The number of hours to look back.
+ * @returns A Promise that resolves to the row array or rejects with an error.
+ */
+function fetchRowsInLast(hourCount)
+{
+	return new Promise((resolve, reject) =>
+	{
+		db.all('SELECT * FROM tweets WHERE strftime(\"%s\", time) > strftime(\"%s\", DATETIME(CURRENT_TIMESTAMP, \"-' + hourCount + ' HOUR\")) ORDER BY strftime(\"%s\", time) DESC;', (error, rows) =>
+		{
+			if (error)
+				reject(error)
+			else
+				resolve(rows)
+		})
+	})
+}
+
 confReader.readOptions(configFile, configOptions).then((options) =>
 {
 	console.info('[  OK  ] Successfully read config information.')
