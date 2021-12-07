@@ -8,12 +8,15 @@ const configOptions =
 {
 	'API Key': '',
 	'API Key Secret': '',
-	'Bearer Token': '',
+	'Access Token': '',
+	'Access Token Secret': '',
 	'Zip Code': '',
 	'Snow Day Count':'',
 	'School Type':''
 }
 var config
+
+var client
 
 /**
  * Convert a school type string to an "extra val" for the snow day calculator.
@@ -86,6 +89,14 @@ confReader.readOptions(configFile, configOptions).then((options) =>
 {
 	console.info('[  OK  ] Successfully read config information.')
 	config = options
+
+	client = new twitter.TwitterApi({
+		appKey: config['API Key'],
+		appSecret: config['API Key Secret'],
+		accessToken: config['Access Token'],
+		accessSecret: config['Access Token Secret']
+	})
+
 }).catch((error) =>
 {
 	console.error(error)
