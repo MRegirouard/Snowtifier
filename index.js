@@ -12,7 +12,12 @@ const configOptions =
 	'Access Token Secret': '',
 	'Zip Code': '',
 	'Snow Day Count':'',
-	'School Type':''
+	'School Type':'',
+	'Cooldown Time':'2', // How long to wait between Tweets
+	'Minimum Prediction':'50', // The minimum prediction to Tweet
+	'Prediction Change Threshold':'10', // The threshold for the prediction change to Tweet
+	'Wakeup Time':'10', // Do not Tweet before this hour (24 hour time)
+	'Sleep Time':'23' // Do not Tweet past this hour (24 hour time)
 }
 var config
 
