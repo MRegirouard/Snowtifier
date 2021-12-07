@@ -105,3 +105,6 @@ dist
 
 # Configuration file
 Options.json
+
+# Tweet SQL database
+Tweets.db
