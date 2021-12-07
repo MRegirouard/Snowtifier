@@ -138,6 +138,57 @@ function getMonth(date)
 	return months[date.getMonth()]
 }
 
+/**
+ * Send a tweet with prediction info, and save it in the database.
+ * @param {Number} pastPrediction The past prediction for the day. Can be -1 if there is no existing tweeted prediction.
+ * @param {Number} currentPrediction The current prediction to tweet about.
+ * @param {Date} predictionDate The date of the prediction.
+ * @returns A promise that resolves with the content when the tweet is sent and the database is updated, or rejects with an error.
+ */
+function sendTweet(pastPrediction, currentPrediction, predictionDate)
+{
+	return new Promise((resolve, reject) =>
+	{
+		var content
+
+		pastPrediction = Math.round(pastPrediction)
+		currentPrediction = Math.round(currentPrediction)
+	
+		if (pastPrediction == -1 || currentPrediction == pastPrediction) // Prediction hasn't changed, or there was no existing prediction
+			content = 'There is a ' + currentPrediction + '% chance of a snow day tomorrow, ' +
+				getWeekday(predictionDate) + ', ' + getMonth(predictionDate) + ' ' + predictionDate.getDate() + '.'
+		else if (currentPrediction > pastPrediction) // Prediction has increased
+			content = 'The chance for a snow day tomorrow has risen from ' + pastPrediction + '% to ' + currentPrediction + '%.'
+		else if (currentPrediction < pastPrediction) // Prediction has decreased
+			content = 'The chance for a snow day tomorrow has dropped from ' + pastPrediction + '% to ' + currentPrediction + '%.'
+	
+		const tomorrow = new Date()
+		tomorrow.setDate(tomorrow.getDate() + 1)
+
+		if (predictionDate.getFullYear() !== tomorrow.getFullYear() ||
+			predictionDate.getMonth() !== tomorrow.getMonth() ||
+			predictionDate.getDate() !== tomorrow.getDate()) // If the prediction is not for tomorrow
+		{
+			content = content.replace('tomorrow,', 'on') // Remove the "tomorrow," from the Tweet
+		}
+
+		client.v2.tweet(content).then((data) => // Tweet the prediction
+		{	
+			tweetInsert.run(currentPrediction, content, data.data.id, (error) => // Update the database
+			{
+				if (error)
+					reject('Error updating Tweet database: ' + error)
+				else
+					resolve(content)
+			})
+		})
+		.catch((error) =>
+		{
+			reject('Error sending Tweet: ' + error)
+		})
+	})
+}
+
 confReader.readOptions(configFile, configOptions).then((options) =>
 {
 	console.info('[  OK  ] Successfully read config information.')
