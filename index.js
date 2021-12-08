@@ -225,6 +225,8 @@ confReader.readOptions(configFile, configOptions).then((options) =>
 		accessToken: config['Access Token'],
 		accessSecret: config['Access Token Secret']
 	})
+	
+	checkAndTweet()
 
 }).catch((error) =>
 {
