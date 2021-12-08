@@ -231,3 +231,100 @@ confReader.readOptions(configFile, configOptions).then((options) =>
 	console.error(error)
 	process.exit(1)
 })
+
+/**
+ * Check if the criteria are met for sending a Tweet, and send one if they are.
+ * Then, sets a timout to check again after a determined time interval.
+ * Criteria:
+ * 	Time is past the wakeup time
+ *  Time is earlier than the sleep time
+ *  There have not been any Tweets before the cooldown time is up
+ *  Either there has been no Tweet yet today and the current prediction is greater than the threshold, 
+ * 	  or there has been a Tweet today and the current prediction is a large enough difference from the last Tweet
+ */
+function checkAndTweet()
+{
+	const today = new Date()
+
+	// Check if it's too early to Tweet
+	if (today.getHours() < config['Wakeup Time'])
+	{
+		const retryTime = new Date()
+		retryTime.setHours(config['Wakeup Time'])
+
+		// Come back when it's time to Tweet
+		setTimeout(checkAndTweet, retryTime.getTime() - today.getTime())
+		return
+	}
+
+	// Check if it's too late to Tweet
+	if (today.getHours() > config['Sleep Time'])
+	{
+		const retryTime = new Date()
+		retryTime.setDate(today.getDate() + 1)
+		retryTime.setHours(config['Wakeup Time'])
+
+		// Come back tomorrow when it's time to Tweet
+		setTimeout(checkAndTweet, retryTime.getTime() - today.getTime())
+		return
+	}
+
+	// Check if it's too soon to Tweet
+	fetchRowsInLast(config['Cooldown Time']).then((rows) =>
+	{
+		if (rows.length > 0)
+		{
+			const retryTime = new Date(rows[0].time) // Parse the last Tweet's date
+			retryTime.setMinutes(retryTime.getMinutes() - new Date().getTimezoneOffset()) // Shift from UTC to local time
+			retryTime.setHours(retryTime.getHours() + config['Cooldown Time']) // Add the cooldown time
+
+			// Come back after the cooldown time has passed
+			setTimeout(checkAndTweet, retryTime.getTime() - today.getTime())
+			return
+		}
+	})
+
+	const tomorrow = new Date()
+	tomorrow.setDate(tomorrow.getDate() + 1)
+
+	getPrediction(tomorrow, config['Zip Code'], config['Snow Day Count'], config['School Type']).then((prediction) =>
+	{
+		fetchRowsInLast(today.getHours() + (today.getMinutes() / 60)).then((rows) =>
+		{
+			var pastPrediction = -1
+
+			if (rows.length > 0)
+			{
+				pastPrediction = rows[0].prediction
+
+				// Check if the prediction is a large enough difference from the last prediction
+				if (Math.abs(pastPrediction - prediction) < config['Prediction Change Threshold'])
+				{
+					// Come back in 10 minutes to see if the prediction has changed enough
+					setTimeout(checkAndTweet, 10 * 60 * 1000)
+					return
+				}
+			}
+			// Check that the prediction is greater than the threshold if there have been no Tweets today yet
+			else if (prediction < config['Minimum Prediction']) 
+			{
+				// Come back in 10 minutes to see if the prediction is high enough
+				setTimeout(checkAndTweet, 10 * 60 * 1000)
+				return
+			}
+
+			sendTweet(pastPrediction, prediction, tomorrow).then((content) =>
+			{
+				console.debug('[  OK  ] Tweeted:', content)
+				setTimeout(checkAndTweet, config['Cooldown Time'] * 60 * 60 * 1000) // Check again after the cooldown time
+			})
+			.catch((error) =>
+			{
+				console.error('[ ERROR ] Error Tweeting:', error)
+			})
+		})
+	}).catch((error) =>
+	{
+		console.error('[ FAIL ] Error getting prediction:', error)
+	})
+}
