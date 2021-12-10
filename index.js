@@ -248,6 +248,19 @@ function checkAndTweet()
 {
 	const today = new Date()
 
+	// Check if tomorrow is not a week day
+	if (today.getDate() > 4)
+	{
+		const retryTime = new Date()
+		retryTime.setDate(retryTime.getDate() + 1)
+		retryTime.setHours(config['Wakeup Time'])
+		retryTime.setMinutes(0)
+
+		// Come back tomorrow morning
+		setTimeout(checkAndTweet, retryTime.getTime() - today.getTime())
+		return
+	}
+
 	// Check if it's too early to Tweet
 	if (today.getHours() < config['Wakeup Time'])
 	{
