@@ -175,6 +175,9 @@ function sendTweet(pastPrediction, currentPrediction, predictionDate)
 			predictionDate.getDate() !== tomorrow.getDate()) // If the prediction is not for tomorrow
 		{
 			content = content.replace('tomorrow,', 'on') // Remove the "tomorrow," from the Tweet
+			content = content.replace('tomorrow', getWeekday(predictionDate)) // Replace the "tomorrow" with the weekday
+			// Content for change reports do not have a comma after "tomorrow", so we can always replace "tomorrow" with the weekday,
+			// But only after the first replacement of "tomorrow,"
 		}
 
 		client.v2.tweet(content).then((data) => // Tweet the prediction
