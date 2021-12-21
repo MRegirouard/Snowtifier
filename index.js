@@ -252,7 +252,7 @@ function checkAndTweet()
 	const today = new Date()
 
 	// Check if tomorrow is not a week day
-	if (today.getDate() > 4)
+	if (today.getDay() > 4)
 	{
 		const retryTime = new Date()
 		retryTime.setDate(retryTime.getDate() + 1)
